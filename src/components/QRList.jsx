@@ -66,6 +66,16 @@ function QRList({ refreshTrigger }) {
               id: Date.now()
             });
             setTimeout(() => setNotification(null), 3000);
+            
+            // Add to updated QRs for pulse effect
+            setUpdatedQRs(prev => new Set([...prev, qr.shortId]));
+            setTimeout(() => {
+              setUpdatedQRs(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(qr.shortId);
+                return newSet;
+              });
+            }, 2000);
           }
           prevScansRef.current[qr.shortId] = qr.scans;
         });
@@ -184,7 +194,10 @@ function QRList({ refreshTrigger }) {
 
       <div className="qr-grid">
         {qrCodes.map((qr) => (
-          <div key={qr.shortId} className="qr-card">
+          <div 
+            key={qr.shortId} 
+            className={`qr-card ${updatedQRs.has(qr.shortId) ? 'qr-card-updated' : ''}`}
+          >
             <div className="qr-card-header">
               <img
                 src={qr.qrCodeImage}
@@ -208,6 +221,32 @@ function QRList({ refreshTrigger }) {
                   <ExternalLink size={14} />
                 </a>
               </div>
+
+              {/* Show customization info */}
+              {qr.customization && (qr.customization.hasLogo || qr.customization.gradientType !== 'none' || qr.customization.dotStyle !== 'square') && (
+                <div className="qr-custom-badges">
+                  {qr.customization.hasLogo && (
+                    <span className="custom-badge badge-logo">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="M21 15l-5-5L5 21"/>
+                      </svg>
+                      Logo
+                    </span>
+                  )}
+                  {qr.customization.gradientType !== 'none' && (
+                    <span className="custom-badge badge-gradient">
+                      ✨ Gradient
+                    </span>
+                  )}
+                  {qr.customization.dotStyle !== 'square' && (
+                    <span className="custom-badge badge-style">
+                      🎨 {qr.customization.dotStyle}
+                    </span>
+                  )}
+                </div>
+              )}
 
               <div className="qr-info">
                 <div className="info-item">

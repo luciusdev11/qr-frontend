@@ -1,23 +1,19 @@
 import axios from 'axios';
 
-// Auto-detect if running on network or localhost
+// Auto-detect API URL
 const getAPIUrl = () => {
-  // Check if there's an environment variable
-  if (process.env.REACT_APP_API_URL) {
+  // Production: use environment variable
+  if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_API_URL) {
     return process.env.REACT_APP_API_URL;
   }
   
-  // If accessing from network IP, use that IP for API
-  const hostname = window.location.hostname;
-  if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-    return `http://${hostname}:5000/api`;
-  }
-  
-  // Default to localhost
+  // Development: use localhost
   return 'http://localhost:5000/api';
 };
 
 const API_URL = getAPIUrl();
+
+console.log('🔗 API URL:', API_URL);
 
 // Create axios instance with default config
 const api = axios.create({
@@ -25,25 +21,48 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: 30000, // 30 seconds
 });
 
-// Request interceptor for logging
+// Request interceptor
 api.interceptors.request.use(
   (config) => {
-    console.log(`API Request: ${config.method.toUpperCase()} ${config.url}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`📤 API Request: ${config.method.toUpperCase()} ${config.url}`);
+    }
     return config;
   },
   (error) => {
+    console.error('❌ Request Error:', error);
     return Promise.reject(error);
   }
 );
 
-// Response interceptor for error handling
+// Response interceptor with retry logic
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error('API Error:', error.response?.data || error.message);
+  (response) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📥 API Response:', response.status, response.data);
+    }
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Retry logic for network errors
+    if (!error.response && !originalRequest._retry) {
+      originalRequest._retry = true;
+      console.warn('⚠️  Network error, retrying...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return api(originalRequest);
+    }
+
+    console.error('❌ API Error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.response?.data?.error || error.message
+    });
+
     return Promise.reject(error);
   }
 );
@@ -51,49 +70,88 @@ api.interceptors.response.use(
 // QR Code API functions
 export const qrAPI = {
   // Generate new QR code
-  generate: async (originalUrl, createdBy = 'anonymous') => {
-    const response = await api.post('/qr/generate', {
-      originalUrl,
-      createdBy,
-    });
-    return response.data;
+  generate: async (originalUrl, createdBy = 'anonymous', customization = {}, logo = null) => {
+    try {
+      const response = await api.post('/qr/generate', {
+        originalUrl,
+        createdBy,
+        customization,
+        logo
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to generate QR code');
+    }
   },
 
-  // Get all QR codes
+  // Get all QR codes with pagination
   list: async (params = {}) => {
-    const { limit = 50, page = 1, sortBy = 'createdAt', order = 'desc' } = params;
-    const response = await api.get('/qr/list', {
-      params: { limit, page, sortBy, order },
-    });
-    return response.data;
+    try {
+      const { limit = 100, page = 1, sortBy = 'createdAt', order = 'desc' } = params;
+      const response = await api.get('/qr/list', {
+        params: { limit, page, sortBy, order },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to fetch QR codes');
+    }
   },
 
   // Get single QR code by ID
   getById: async (id) => {
-    const response = await api.get(`/qr/${id}`);
-    return response.data;
+    try {
+      const response = await api.get(`/qr/${id}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to fetch QR code');
+    }
   },
 
   // Delete QR code
   delete: async (id) => {
-    const response = await api.delete(`/qr/${id}`);
-    return response.data;
+    try {
+      const response = await api.delete(`/qr/${id}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to delete QR code');
+    }
   },
 
   // Get QR code statistics
   getStats: async (id) => {
-    const response = await api.get(`/qr/stats/${id}`);
-    return response.data;
+    try {
+      const response = await api.get(`/qr/stats/${id}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to fetch statistics');
+    }
   },
 };
 
-// Health check
+// Health check with detailed info
 export const healthCheck = async () => {
   try {
     const response = await api.get('/health');
-    return response.data;
+    return { 
+      status: 'OK', 
+      ...response.data 
+    };
   } catch (error) {
-    return { status: 'ERROR', error: error.message };
+    return { 
+      status: 'ERROR', 
+      error: error.message,
+      details: error.response?.data 
+    };
+  }
+};
+
+// Test connection
+export const testConnection = async () => {
+  try {
+    const health = await healthCheck();
+    return health.status === 'OK';
+  } catch (error) {
+    return false;
   }
 };
 

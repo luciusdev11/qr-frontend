@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { QrCode } from 'lucide-react';
 import QRGenerator from './components/QRGenerator';
 import QRList from './components/QRList';
+import Login from './components/Login';
+import { LogOut } from 'lucide-react';
 import { healthCheck } from './services/api';
 import './App.css';
 
@@ -9,9 +11,13 @@ function App() {
   const [activeTab, setActiveTab] = useState('generate');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [apiStatus, setApiStatus] = useState('checking');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
     checkAPIHealth();
+    checkAuthStatus();
   }, []);
 
   const checkAPIHealth = async () => {
@@ -19,10 +25,56 @@ function App() {
     setApiStatus(health.status === 'OK' ? 'online' : 'offline');
   };
 
+  const checkAuthStatus = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/check`, {
+        credentials: 'include'
+      });
+      const data = await response.json();
+      setIsAuthenticated(data.isAuthenticated);
+      setUser(data.user);
+    } catch (error) {
+      console.error('Auth check failed:', error);
+    } finally {
+      setCheckingAuth(false);
+    }
+  };
+
+  const handleLogin = (userData) => {
+    setIsAuthenticated(true);
+    setUser(userData);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      setIsAuthenticated(false);
+      setUser(null);
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   const handleGenerated = (newQR) => {
     setRefreshTrigger(prev => prev + 1);
     setActiveTab('list');
   };
+
+  if (checkingAuth) {
+    return (
+      <div className="loading-screen">
+        <div className="spinner-large"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
     <div className="app">
@@ -33,18 +85,20 @@ function App() {
             <div className="logo">
               <QrCode size={40} />
               <div>
-                <h1>QR Code Generator & Tracker</h1>
-                <p className="subtitle">Create trackable QR codes with MongoDB storage</p>
+                <h1>QR Code Generator</h1>
+                <p className="subtitle">v1.0.1 • Advanced Customization</p>
               </div>
             </div>
             <div className="status-indicator">
               <span className={`status-dot ${apiStatus}`}></span>
               <span className="status-text">
-                {apiStatus === 'online' ? 'API Connected' : 
-                 apiStatus === 'offline' ? 'API Offline' : 
-                 'Checking...'}
+                {apiStatus === 'online' ? 'Connected' : 'Offline'}
               </span>
             </div>
+            <button onClick={handleLogout} className="btn-logout">
+                <LogOut size={18} />
+                Logout
+            </button>
           </div>
         </header>
 

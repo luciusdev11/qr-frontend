@@ -12,10 +12,11 @@ function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [apiStatus, setApiStatus] = useState('checking');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [setUser] = useState(null);
+  const [user, setUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     checkAPIHealth();
     checkAuthStatus();
   }, []);

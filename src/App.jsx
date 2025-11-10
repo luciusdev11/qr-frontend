@@ -12,7 +12,7 @@ function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [apiStatus, setApiStatus] = useState('checking');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  // const [user, setUser] = useState(null);
+  const [setUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {

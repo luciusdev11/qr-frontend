@@ -16,7 +16,10 @@ function App() {
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    console.log('Logged in user:', user);
+  }, [user]);
+
+  useEffect(() => {
     checkAPIHealth();
     checkAuthStatus();
   }, []);

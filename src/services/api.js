@@ -1,32 +1,36 @@
 import axios from 'axios';
+import backendFailover from './backendFailover';
 
-// Auto-detect API URL
+// Use failover system for API URL
 const getAPIUrl = () => {
-  // Production: use environment variable
-  if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
-  }
-  
-  // Development: use localhost
-  return 'http://localhost:5000/api';
+  return backendFailover.getCurrentURL();
 };
 
-const API_URL = getAPIUrl();
+console.log('🔗 Initial API URL:', getAPIUrl());
 
-console.log('🔗 API URL:', API_URL);
+// Listen for backend changes
+window.addEventListener('backend-changed', (event) => {
+  console.log(`🔄 Backend switched to: ${event.detail.backend}`);
+});
 
-// Create axios instance with default config
+window.addEventListener('backends-down', () => {
+  console.error('❌ All backends are down!');
+});
+
+// Create axios instance with dynamic base URL
 const api = axios.create({
-  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 seconds
+  timeout: 30000,
+  withCredentials: true
 });
 
-// Request interceptor
+// Request interceptor - use current backend URL
 api.interceptors.request.use(
   (config) => {
+    config.baseURL = getAPIUrl();
+    
     if (process.env.NODE_ENV === 'development') {
       console.log(`📤 API Request: ${config.method.toUpperCase()} ${config.url}`);
     }
@@ -38,7 +42,7 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor with retry logic
+// Response interceptor with automatic retry on different backend
 api.interceptors.response.use(
   (response) => {
     if (process.env.NODE_ENV === 'development') {
@@ -49,12 +53,26 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Retry logic for network errors
-    if (!error.response && !originalRequest._retry) {
+    // If request failed and hasn't been retried yet
+    if (!originalRequest._retry && error.code === 'ECONNABORTED' || !error.response) {
       originalRequest._retry = true;
-      console.warn('⚠️  Network error, retrying...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return api(originalRequest);
+      
+      console.warn('⚠️  Request failed, trying failover backend...');
+
+      try {
+        // Use failover system to try next backend
+        const endpoint = originalRequest.url.replace(originalRequest.baseURL, '');
+        const result = await backendFailover.makeRequest(endpoint, {
+          method: originalRequest.method,
+          headers: originalRequest.headers,
+          body: originalRequest.data ? JSON.stringify(originalRequest.data) : undefined
+        });
+
+        return { data: result };
+      } catch (failoverError) {
+        console.error('❌ All backends failed:', failoverError);
+        return Promise.reject(failoverError);
+      }
     }
 
     console.error('❌ API Error:', {
@@ -69,14 +87,14 @@ api.interceptors.response.use(
 
 // QR Code API functions
 export const qrAPI = {
-  // Generate new QR code
-  generate: async (originalUrl, createdBy = 'anonymous', customization = {}, logo = null) => {
+  // Generate new QR code (client-side rendering)
+  generate: async (originalUrl, createdBy = 'anonymous', customization = {}, qrCodeImage = null) => {
     try {
       const response = await api.post('/qr/generate', {
         originalUrl,
         createdBy,
         customization,
-        logo
+        qrCodeImage // Send pre-generated image from client
       });
       return response.data;
     } catch (error) {
@@ -134,7 +152,8 @@ export const healthCheck = async () => {
     const response = await api.get('/health');
     return { 
       status: 'OK', 
-      ...response.data 
+      ...response.data,
+      backend: backendFailover.getCurrentBackend().name
     };
   } catch (error) {
     return { 
@@ -145,14 +164,14 @@ export const healthCheck = async () => {
   }
 };
 
-// Test connection
-export const testConnection = async () => {
-  try {
-    const health = await healthCheck();
-    return health.status === 'OK';
-  } catch (error) {
-    return false;
-  }
+// Get backend status
+export const getBackendStatus = () => {
+  return backendFailover.getStatus();
 };
 
-export default api;
+// Force backend switch
+export const switchBackend = async (backendName) => {
+  return await backendFailover.switchBackend(backendName);
+};
+
+export default api

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, User, Sparkles } from 'lucide-react';
+import { Lock, User, Sparkles, Zap } from 'lucide-react';
 import './Login.css';
 
 function Login({ onLogin }) {
@@ -14,7 +14,9 @@ function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/login`, {
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,7 +33,7 @@ function Login({ onLogin }) {
         setError(data.error || 'Login failed');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError('Network error. Please check if backend is running.');
     } finally {
       setLoading(false);
     }
@@ -43,15 +45,16 @@ function Login({ onLogin }) {
         <div className="anime-stars"></div>
         <div className="anime-stars"></div>
         <div className="anime-stars"></div>
+        <div className="floating-particles"></div>
       </div>
 
       <div className="login-card">
         <div className="login-header">
           <div className="login-icon">
-            <Sparkles size={48} />
+            <Zap size={48} className="icon-glow" />
           </div>
           <h1>QR Tracker</h1>
-          <p>Personal QR Code Management</p>
+          <p className="version-badge">v1.0.2b • Personal Edition</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
@@ -68,6 +71,7 @@ function Login({ onLogin }) {
               placeholder="Enter username"
               required
               autoComplete="username"
+              className="anime-input"
             />
           </div>
 
@@ -84,12 +88,13 @@ function Login({ onLogin }) {
               placeholder="Enter password"
               required
               autoComplete="current-password"
+              className="anime-input"
             />
           </div>
 
           {error && (
             <div className="error-alert">
-              <span>❌ {error}</span>
+              <span>⚠️ {error}</span>
             </div>
           )}
 
@@ -101,19 +106,19 @@ function Login({ onLogin }) {
             {loading ? (
               <>
                 <div className="spinner-small"></div>
-                Logging in...
+                Authenticating...
               </>
             ) : (
               <>
-                <Lock size={18} />
-                Login
+                <Sparkles size={18} />
+                Access Dashboard
               </>
             )}
           </button>
         </form>
 
         <div className="login-footer">
-          <p>🔐 Personal use only • Secure session</p>
+          <p>🔐 Secure Session • Auto-logout on tab close</p>
         </div>
       </div>
     </div>

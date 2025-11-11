@@ -90,7 +90,7 @@ function App() {
               <QrCode size={40} />
               <div>
                 <h1>QR Code Generator</h1>
-                <p className="subtitle">v1.0.1 • Advanced Customization</p>
+                <p className="subtitle">v1.0.2b • Advanced Customization</p>
               </div>
             </div>
             <div className="status-indicator">

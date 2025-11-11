@@ -53,11 +53,12 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If request failed and hasn't been retried yet
-    if (!originalRequest._retry && error.code === 'ECONNABORTED' || !error.response) {
-      originalRequest._retry = true;
-      
-      console.warn('⚠️  Request failed, trying failover backend...');
+    try {
+      if (!originalRequest._retry && (error.code === 'ECONNABORTED' || !error.response)) {
+        // Mark request as retried to prevent infinite loop
+        originalRequest._retry = true;
+    
+        console.warn('⚠️ Request failed, trying failover backend...');
 
       try {
         // Use failover system to try next backend

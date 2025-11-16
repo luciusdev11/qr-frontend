@@ -1,4 +1,4 @@
-/* QRList.css */
+/* QRList.css - Anime Black-Blue Theme */
 .qr-list {
   width: 100%;
   position: relative;
@@ -20,27 +20,16 @@
 }
 
 @keyframes slideIn {
-  from {
-    transform: translateX(400px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes slideOut {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(400px);
-    opacity: 0;
-  }
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(400px); opacity: 0; }
 }
 
+/* List Header */
 .list-header {
   display: flex;
   justify-content: space-between;
@@ -55,13 +44,13 @@
 }
 
 .list-header h2 {
-  color: #111827;
+  color: #e5e7eb;
   font-size: 24px;
   margin: 0;
 }
 
 .refresh-indicator {
-  color: #667eea;
+  color: #60a5fa;
   font-size: 14px;
   font-weight: 600;
   animation: pulse-text 1.5s ease-in-out infinite;
@@ -92,40 +81,25 @@
   to { transform: rotate(360deg); }
 }
 
-.countdown-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #ef4444;
-  color: white;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 20px;
-  text-align: center;
-}
-
-.btn-icon {
-  position: relative;
-}
-
+/* QR Grid */
 .qr-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 24px;
 }
 
+/* QR Card */
 .qr-card {
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s;
+  color: #e5e7eb;
 }
 
 .qr-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3), 0 0 10px rgba(139, 92, 246, 0.2);
   transform: translateY(-4px);
 }
 
@@ -136,42 +110,45 @@
 }
 
 @keyframes pulse-card {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
 }
 
+/* QR Card Header */
 .qr-card-header {
-  background: #f9fafb;
+  background: rgba(15, 23, 42, 0.9);
   padding: 20px;
   display: flex;
   justify-content: center;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s;
 }
 
+.qr-card-header:hover {
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.6), 0 0 40px rgba(139, 92, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+/* QR Image */
 .qr-image {
   width: 150px;
   height: 150px;
   border-radius: 8px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid rgba(59, 130, 246, 0.3);
 }
 
+/* QR Card Body */
 .qr-card-body {
   padding: 20px;
 }
 
-.qr-url {
-  margin-bottom: 16px;
-}
-
+/* QR URL */
 .qr-url label {
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #6b7280;
+  color: #94a3b8;
   margin-bottom: 4px;
   text-transform: uppercase;
 }
@@ -180,17 +157,23 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #667eea;
+  color: #60a5fa;
   text-decoration: none;
   font-size: 14px;
   word-break: break-all;
+  text-shadow: 0 0 4px rgba(59, 130, 246, 0.7), 0 0 8px rgba(59, 130, 246, 0.5);
+  transition: all 0.3s;
 }
 
 .url-link:hover {
   text-decoration: underline;
+  text-shadow: 0 0 6px rgba(59, 130, 246, 0.9), 0 0 12px rgba(139, 92, 246, 0.6);
+  color: #3b82f6;
 }
 
-/* URL Blur Effect */
+/* ======================= */
+/* URL Blur Effect         */
+/* ======================= */
 .blurred {
   filter: blur(5px);
   transition: filter 0.3s;
@@ -201,7 +184,9 @@
   filter: blur(3px);
 }
 
+/* ======================= */
 /* Toggle Switch for Auto-Refresh */
+/* ======================= */
 .auto-refresh-toggle {
   display: flex;
   align-items: center;
@@ -276,7 +261,9 @@
   margin-left: 10px;
 }
 
-/* Scan Graph Styles */
+/* ======================= */
+/* Scan Graph Styles       */
+/* ======================= */
 .scan-graph {
   margin-top: 24px;
   padding: 20px;
@@ -350,7 +337,72 @@
   text-align: center;
 }
 
-/* Recent Scans Updates */
+/* ======================= */
+/* QR Info Box Styles      */
+/* ======================= */
+.qr-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.85); /* dark blue background */
+  border: 2px solid rgba(59, 130, 246, 0.3); /* main blue border */
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e5e7eb; /* light text to match theme */
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.info-item span {
+  font-weight: 700; /* highlight the value */
+  color: #60a5fa; /* main blue for values */
+}
+
+.info-item.scans {
+  margin-left: auto;
+  color: #10b981; /* green for scan count */
+}
+
+.scan-count {
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .qr-info {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .info-item.scans {
+    margin-left: 0;
+  }
+}
+
+/* QR Actions */
+.qr-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.qr-actions .btn {
+  flex: 1;
+}
+
+/* Recent Scans */
 .recent-scans {
   margin-top: 20px;
 }
@@ -367,22 +419,24 @@
 }
 
 .recent-scans li {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #e5e7eb;
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 8px;
   font-size: 13px;
-  color: #94a3b8;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all 0.2s;
+  transition: all 0.3s;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.2);
 }
 
 .recent-scans li:hover {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(15, 23, 42, 0.95);
+  border-color: #3b82f6;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6), 0 0 20px rgba(139, 92, 246, 0.4);
 }
 
 .scan-time {
@@ -393,69 +447,7 @@
   font-size: 16px;
 }
 
-/* Feature Notice */
-.feature-notice {
-  margin-top: 16px;
-  padding: 16px;
-  background: rgba(234, 179, 8, 0.1);
-  border: 2px dashed rgba(234, 179, 8, 0.3);
-  border-radius: 12px;
-  text-align: center;
-}
-
-.feature-notice p {
-  color: #fbbf24;
-  font-size: 13px;
-  margin: 4px 0;
-  font-weight: 600;
-}
-
-.feature-notice p:first-child {
-  font-size: 14px;
-}
-
-.btn-reset-small {
-  padding: 6px 12px;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  border-radius: 8px;
-  color: #3b82f6;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-reset-small:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.5);
-}
-
-.qr-info {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.info-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #6b7280;
-  font-size: 14px;
-}
-
-.info-item.scans {
-  margin-left: auto;
-}
-
-.scan-count {
-  font-weight: 700;
-  color: #10b981;
-}
-
+/* Tracking URL Input */
 .tracking-url {
   margin-bottom: 16px;
 }
@@ -464,7 +456,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #6b7280;
+  color: #94a3b8;
   margin-bottom: 4px;
   text-transform: uppercase;
 }
@@ -472,50 +464,22 @@
 .tracking-input {
   width: 100%;
   padding: 8px 12px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
   font-size: 13px;
   font-family: monospace;
+  color: #e5e7eb;
+  transition: all 0.3s;
 }
 
-.qr-actions {
-  display: flex;
-  gap: 8px;
+.tracking-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
-.qr-actions .btn {
-  flex: 1;
-}
-
-/* Loading & Empty States */
-.loading-container,
-.error-container,
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-}
-
-.loading-container .spinner {
-  color: #667eea;
-  margin-bottom: 16px;
-}
-
-.empty-icon {
-  font-size: 64px;
-  margin-bottom: 16px;
-}
-
-.empty-state h3 {
-  color: #111827;
-  margin-bottom: 8px;
-}
-
-.empty-state p {
-  color: #6b7280;
-}
-
-/* Modal */
+/* Modal & Stats Popup */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -531,12 +495,15 @@
 }
 
 .modal {
-  background: white;
+  background: rgba(15, 23, 42, 0.95);
   border-radius: 12px;
   max-width: 500px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #e5e7eb;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
 }
 
 .modal-header {
@@ -544,12 +511,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #111827;
+  color: #60a5fa;
 }
 
 .modal-close {
@@ -557,7 +524,7 @@
   border: none;
   font-size: 28px;
   cursor: pointer;
-  color: #6b7280;
+  color: #e5e7eb;
   padding: 0;
   width: 32px;
   height: 32px;
@@ -569,52 +536,11 @@
 }
 
 .modal-close:hover {
-  background: #f3f4f6;
+  background: rgba(59, 130, 246, 0.2);
 }
 
 .modal-body {
   padding: 20px;
-}
-
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.stat-item label {
-  font-weight: 600;
-  color: #374151;
-}
-
-.stat-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: #667eea;
-}
-
-.recent-scans {
-  margin-top: 20px;
-}
-
-.recent-scans h4 {
-  color: #374151;
-  margin-bottom: 12px;
-}
-
-.recent-scans ul {
-  list-style: none;
-  padding: 0;
-}
-
-.recent-scans li {
-  background: #f9fafb;
-  padding: 10px 12px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #6b7280;
 }
 
 /* Responsive */

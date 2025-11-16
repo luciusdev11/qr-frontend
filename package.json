@@ -1,6 +1,6 @@
 {
   "name": "qrweb-frontend",
-  "version": "1.0.2b",
+  "version": "1.0.3",
   "description": "QR Code Generator and Tracker Frontend",
   "private": true,
   "main": "src/App.jsx",
